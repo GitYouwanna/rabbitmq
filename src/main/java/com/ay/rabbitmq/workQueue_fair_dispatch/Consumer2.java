@@ -1,4 +1,4 @@
-package com.ay.rabbitmq.workQueue;
+package com.ay.rabbitmq.workQueue_fair_dispatch;
 
 import com.ay.rabbitmq.util.ConnectionUtil;
 import com.rabbitmq.client.*;
@@ -13,6 +13,8 @@ public class Consumer2 {
         Connection connection = ConnectionUtil.getConnection();
         final Channel channel = connection.createChannel();
         channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+
+        channel.basicQos(1);
         //定义消费者监听队列
         Consumer consumer = new DefaultConsumer(channel){
            //消息到达触发
@@ -26,10 +28,14 @@ public class Consumer2 {
                     e.printStackTrace();
                 }finally {
                     System.out.println("【consumer2】处理结束");
+                    //消费完发送回执
+                    channel.basicAck(envelope.getDeliveryTag(),false);
                 }
             }
         };
-        boolean autoAck = true;
+        //boolean autoAck = true;
+
+        boolean autoAck = false;
         channel.basicConsume(QUEUE_NAME,autoAck,consumer);
     }
 }

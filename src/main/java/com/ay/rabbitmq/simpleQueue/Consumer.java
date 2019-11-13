@@ -28,7 +28,7 @@ public class Consumer {
             }
         };
 
-        //坚挺队列
+        //监听队列
         channel.basicConsume(QUEUE_NAME,true,consumer);
     }
 
